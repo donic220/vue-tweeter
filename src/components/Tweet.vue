@@ -4,16 +4,23 @@ import {
     Ref
 } from 'vue'
 import tweetData from '../TweetData.json'
+import TweetPostForm from './TweetPostForm.vue';
+import TweetList from './TweetList.vue';
 
 const inputtingDescription = ref < string > ('')
 const tweets = ref(tweetData);
 
-const postTweets = () => {
+const postTweets = (description: string) => {
     const tweet = {
         id: Math.random(),
-        description: inputtingDescription.value
+        description
     }
     tweets.value.push(tweet)
+    inputtingDescription.value = ''
+}
+
+const deleteTweets = (id: number) => {
+    tweets.value = tweets.value.filter(tweet => tweet.id !== id);
 }
 </script>
 
@@ -21,16 +28,13 @@ const postTweets = () => {
 <div class="container">
     <h1>Tweeter</h1>
     <div class="form-container">
-        <input v-model="inputtingDescription" />
-        <button class="save-button" @click="postTweets()">post</button>
+        <TweetPostForm @post-tweet="postTweets" />
     </div>
-    <div class="tweet-container"> 
-        <ul>
-            <li v-for="tweet in tweets" :key="tweet.id" class="tweet-list">
-                <span>{{ tweet.description }}</span>
-                <button class="delete-button">delete</button>
-            </li>
-        </ul>
+    <div class="tweet-container">
+        <p v-if="tweets.length <= 0 ">No tweets have been added</p>
+        <ul v-else>
+            <TweetList :tweets="tweets" @delete-tweet="deleteTweets" />
+         </ul>
     </div>
 </div>
 </template>
@@ -47,22 +51,10 @@ const postTweets = () => {
     flex-direction: column;
     align-items: center;
     background-color: aliceblue;
-    padding: 24px 0;
+    padding: 10px 0;
     width: 60%;
     margin-bottom: 12px;
     border-radius: 4px;
-}
-
-.tweet-list {
-    list-style: none;
-    margin: 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    background-color: rgb(204, 219, 233);
-    padding: 8px 20px;
-    width: 300px;
 }
 
 .save-button {
@@ -76,17 +68,8 @@ const postTweets = () => {
     height: 22px;
 }
 
-.button {
-    color: #fff;
-    font-weight: bold;
-    background-color: #68c9c9;
-    border-radius: 2px;
-    border: none;
-    width: 60px;
-    height: 22px;
-}
-
-button:hover {
+.save-button:hover {
     background-color: #37bdbd;
 }
+
 </style>
